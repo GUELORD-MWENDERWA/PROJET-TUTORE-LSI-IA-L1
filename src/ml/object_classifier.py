@@ -2,17 +2,29 @@ import pandas as pd
 import joblib
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
 
 
 class ObjectKNNClassifier:
-    """Classifieur scikit-learn (StandardScaler + KNN)."""
+    """Classifieur scikit-learn robuste (StandardScaler + RandomForest)."""
 
     def __init__(self, k=5):
+        n_estimators = max(200, int(k) * 40)
         self.pipeline = Pipeline(
-            [("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_neighbors=k, weights="distance"))]
+            [
+                ("scaler", StandardScaler()),
+                (
+                    "rf",
+                    RandomForestClassifier(
+                        n_estimators=n_estimators,
+                        random_state=42,
+                        class_weight="balanced_subsample",
+                        n_jobs=-1,
+                    ),
+                ),
+            ]
         )
 
     def train(self, X, y):
@@ -23,6 +35,9 @@ class ObjectKNNClassifier:
 
     def predict_batch(self, X):
         return self.pipeline.predict(X)
+
+    def predict_proba(self, x):
+        return self.pipeline.predict_proba([x])[0]
 
     def save(self, path):
         joblib.dump(self.pipeline, path)

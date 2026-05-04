@@ -2,7 +2,7 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 
-from core.image_feature_extractor import extract_object_features, preprocess_mask_for_debug
+from core.image_feature_extractor import extract_object_features
 from ml.generate_image_dataset import FEATURE_COLUMNS, generate_image_dataset, save_dataset
 from ml.object_classifier import ObjectKNNClassifier, load_dataset, train_and_evaluate
 
@@ -63,11 +63,18 @@ def predict_single_image(model_path, image_path):
     return prediction
 
 
-def build_preprocessed_mask(image_path):
-    image = cv2.imread(image_path)
+def predict_single_image_with_confidence(model_path, image_path):
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     if image is None:
         raise ValueError(f"Image introuvable ou invalide: {image_path}")
-    mask = preprocess_mask_for_debug(image)
-    if mask is None:
-        raise ValueError("Impossible de generer le masque binaire.")
-    return mask
+
+    features = extract_object_features(image)
+    if features is None:
+        raise ValueError("Impossible d'extraire les features depuis cette image.")
+
+    model = ObjectKNNClassifier()
+    model.load(model_path)
+    prediction = model.predict(features)
+    proba = model.predict_proba(features)
+    confidence = float(max(proba))
+    return prediction, confidence

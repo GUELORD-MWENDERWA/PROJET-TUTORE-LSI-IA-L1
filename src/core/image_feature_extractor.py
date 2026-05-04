@@ -20,6 +20,11 @@ def preprocess_object_mask(image: np.ndarray):
     return gray, masks
 
 
+def _touches_border(contour, width: int, height: int):
+    x, y, w, h = cv2.boundingRect(contour)
+    return x <= 1 or y <= 1 or (x + w) >= (width - 1) or (y + h) >= (height - 1)
+
+
 def _select_object_contour(gray: np.ndarray):
     """Trouve le meilleur contour objet en gerant fond clair/sombre."""
     prep = preprocess_object_mask(gray)
@@ -34,28 +39,56 @@ def _select_object_contour(gray: np.ndarray):
 
     best = None
     best_mask = None
-    best_area = 0.0
-    fallback = None
-    fallback_mask = None
-    fallback_area = 0.0
+    best_score = -1e9
 
     for mask in candidates:
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for contour in contours:
             area = float(cv2.contourArea(contour))
-            if area <= fallback_area:
+            if area <= 5.0:
                 continue
-            fallback = contour
-            fallback_mask = mask
-            fallback_area = area
-            if min_area <= area <= max_area and area > best_area:
+            perimeter = float(cv2.arcLength(contour, True))
+            if perimeter <= 1e-6:
+                continue
+
+            area_ratio = area / img_area
+            score = area_ratio * 4.0
+            if min_area <= area <= max_area:
+                score += 2.0
+            if _touches_border(contour, w, h):
+                score -= 4.0
+            circularity = float((4.0 * math.pi * area) / (perimeter * perimeter))
+            if circularity < 0.08:
+                score -= 2.0
+
+            if score > best_score:
                 best = contour
                 best_mask = mask
-                best_area = area
+                best_score = score
 
-    if best is not None:
-        return best, best_mask
-    return fallback, fallback_mask
+    return best, best_mask
+
+
+def _center_mask(mask: np.ndarray):
+    """Recentre l'objet principal dans une image de meme taille."""
+    if mask is None:
+        return None
+    ys, xs = np.where(mask > 0)
+    if len(xs) == 0 or len(ys) == 0:
+        return mask
+
+    min_x, max_x = int(xs.min()), int(xs.max())
+    min_y, max_y = int(ys.min()), int(ys.max())
+    crop = mask[min_y : max_y + 1, min_x : max_x + 1]
+
+    h, w = mask.shape[:2]
+    ch, cw = crop.shape[:2]
+    y0 = max((h - ch) // 2, 0)
+    x0 = max((w - cw) // 2, 0)
+
+    centered = np.zeros_like(mask)
+    centered[y0 : y0 + ch, x0 : x0 + cw] = crop
+    return centered
 
 
 def extract_object_features(image: np.ndarray):
@@ -68,9 +101,17 @@ def extract_object_features(image: np.ndarray):
     else:
         gray = image.copy()
 
-    contour, _ = _select_object_contour(gray)
+    contour, selected_mask = _select_object_contour(gray)
     if contour is None:
         return None
+
+    centered_mask = _center_mask(selected_mask)
+    if centered_mask is None:
+        return None
+    contours, _ = cv2.findContours(centered_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return None
+    contour = max(contours, key=cv2.contourArea)
 
     area = float(cv2.contourArea(contour))
     if area < 5:
@@ -81,6 +122,7 @@ def extract_object_features(image: np.ndarray):
         return None
 
     x, y, w, h = cv2.boundingRect(contour)
+    box_area = float(max(w * h, 1))
     aspect_ratio = float(min(w, h) / max(w, h))
     extent = float(area / (w * h))
     circularity = float((4.0 * math.pi * area) / (perimeter * perimeter))
@@ -92,8 +134,25 @@ def extract_object_features(image: np.ndarray):
 
     approx_fine = cv2.approxPolyDP(contour, 0.02 * perimeter, True)
     approx_coarse = cv2.approxPolyDP(contour, 0.05 * perimeter, True)
+    approx_mid = cv2.approxPolyDP(contour, 0.03 * perimeter, True)
     vertices_fine = float(len(approx_fine))
+    vertices_mid = float(len(approx_mid))
     vertices_coarse = float(len(approx_coarse))
+
+    (_, _), radius = cv2.minEnclosingCircle(contour)
+    circle_area = float(math.pi * radius * radius) if radius > 1e-6 else 1.0
+    circle_fill = float(area / circle_area)
+    area_ratio = float(area / gray.size)
+    box_fill = float(area / box_area)
+
+    eccentricity = 0.0
+    if len(contour) >= 5:
+        (_, _), (ma, mi), _ = cv2.fitEllipse(contour)
+        major = float(max(ma, mi))
+        minor = float(min(ma, mi))
+        if major > 1e-6:
+            eccentricity = float(math.sqrt(max(major * major - minor * minor, 0.0)) / major)
+
     moments = cv2.moments(contour)
     hu = cv2.HuMoments(moments).flatten()
     hu_log = [-np.sign(v) * np.log10(max(abs(v), 1e-12)) for v in hu]
@@ -109,7 +168,12 @@ def extract_object_features(image: np.ndarray):
             perimeter,
             area,
             vertices_fine,
+            vertices_mid,
             vertices_coarse,
+            box_fill,
+            circle_fill,
+            area_ratio,
+            eccentricity,
             float(hu_log[0]),
             float(hu_log[1]),
             float(hu_log[2]),
@@ -128,4 +192,4 @@ def preprocess_mask_for_debug(image: np.ndarray):
     else:
         gray = image.copy()
     _, mask = _select_object_contour(gray)
-    return mask    
+    return _center_mask(mask)

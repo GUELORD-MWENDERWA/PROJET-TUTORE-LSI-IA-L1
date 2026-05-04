@@ -23,11 +23,13 @@ save_dataset(dataset, dataset_path)
 
 X, y = load_dataset(dataset_path)
 print(f"\nDataset charge: {len(X)} exemples")
-print(f"Cercle: {sum(y == 'Cercle')} | Rectangle: {sum(y == 'Rectangle')} | Triangle: {sum(y == 'Triangle')}")
+for label in sorted(set(y)):
+    print(f"{label}: {sum(y == label)}", end=" | ")
+print()
 
-results = train_and_evaluate(X, y, k=5)
-model = results["model"]
-print(f"Modele entraine avec k=5, accuracy={results['accuracy']:.3f}")
+train_results = train_and_evaluate(X, y, k=5)
+model = train_results["model"]
+print(f"Modele entraine avec k=5, accuracy={train_results['accuracy']:.3f}")
 
 # Tests avec images artificielles
 print("\n" + "=" * 70)
@@ -48,32 +50,40 @@ cv2.rectangle(img, (18, 28), (78, 64), 255, -1)
 test_cases["Rectangle propre"] = {"image": img, "expected": "Rectangle"}
 
 img = blank()
+cv2.rectangle(img, (24, 24), (72, 72), 255, -1)
+test_cases["Carre propre"] = {"image": img, "expected": "Carre"}
+
+img = blank()
 pts = np.array([[48, 14], [18, 78], [78, 78]], dtype=np.int32)
 cv2.fillPoly(img, [pts], 255)
 test_cases["Triangle propre"] = {"image": img, "expected": "Triangle"}
 
-results = {"✓": 0, "✗": 0}
+img = blank()
+cv2.ellipse(img, (48, 48), (24, 14), 30, 0, 360, 255, -1)
+test_cases["Ellipse propre"] = {"image": img, "expected": "Ellipse"}
+
+test_results = {"OK": 0, "KO": 0}
 for name, test_case in test_cases.items():
     features = extract_object_features(test_case["image"])
 
     if features is not None:
         prediction = model.predict(features)
-        status = "✓" if prediction == test_case["expected"] else "✗"
-        if status == "✓":
-            results["✓"] += 1
+        status = "OK" if prediction == test_case["expected"] else "KO"
+        if status == "OK":
+            test_results["OK"] += 1
         else:
-            results["✗"] += 1
+            test_results["KO"] += 1
         print(f"{status} {name:30} -> {prediction:12} (attendu: {test_case['expected']})")
         print(
             f"   Features: w={features[0]:5.1f} h={features[1]:5.1f} "
             f"aspect={features[2]:.2f} circ={features[3]:.2f} area={features[7]:.1f}"
         )
     else:
-        print(f"✗ {name:30} -> Objet invalide")
-        results["✗"] += 1
+        print(f"KO {name:30} -> Objet invalide")
+        test_results["KO"] += 1
 
 print("\n" + "=" * 70)
-print(f"RESUME: {results['✓']} reussis, {results['✗']} echoues")
+print(f"RESUME: {test_results['OK']} reussis, {test_results['KO']} echoues")
 print("=" * 70)
 print("\nMatrice de confusion:")
-print(results["confusion_matrix"])
+print(train_results["confusion_matrix"])

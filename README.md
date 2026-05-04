@@ -1,84 +1,58 @@
-# 🧠 Projet IA - Reconnaissance d'Objets sur Images
+# Projet IA - Reconnaissance de formes
 
-Projet de synthese IA centre sur le passage **donnee brute (image)** -> **features mathematiques** -> **decision algorithmique**.
-Technologies: `Python`, `NumPy`, `Pandas`, `OpenCV`, `Matplotlib`, `scikit-learn`.
+Ce projet entraine un modele de Machine Learning pour reconnaitre des formes geometriques depuis une image.
 
-## 📋 Structure du Projet
+Formes prises en charge:
+- `Carre`
+- `Rectangle`
+- `Cercle`
+- `Triangle`
+- `Ellipse`
+- `Pentagone`
+- `Hexagone`
 
-```
-.
-├── data/
-│   └── processed/
-│       └── objects.csv                    # Dataset d'entrainement
-├── src/
-│   ├── main.py                            # Pipeline complet (entrainement + prediction image)
-│   ├── core/
-│   │   └── image_feature_extractor.py     # Extraction de features depuis image
-│   └── ml/
-│       ├── object_classifier.py           # Classifieur KNN
-│       └── generate_image_dataset.py      # Generation d'images + dataset CSV
-├── tests/
-├── requirements.txt
-└── README.md
+## Installation
+
+```bash
+python -m venv env
+.\env\Scripts\activate
+pip install -r requirements.txt
 ```
 
-## 🚀 Installation
+## Lancer le projet
 
-1. `python -m venv env`
-2. `.\env\Scripts\Activate.ps1`
-3. `pip install -r requirements.txt`
-
-## 🎯 Utilisation
-
-Lancer l'interface PyQt5:
-
+- Interface graphique:
 ```bash
 python src/main.py
 ```
 
-Dans l'UI:
-- bouton **Entrainer / Re-entrainer** pour construire le modele
-- bouton **Charger une image** pour selectionner une image
-- bouton **Predire la forme** pour obtenir la classe
-
-Predire la forme sur une image donnee:
-
+- Mode CLI (entrainement + prediction d'une image):
 ```bash
-python src/main.py --image "chemin/vers/mon_image.png"
+python src/main.py --cli --image "chemin/vers/image.png"
 ```
 
-### Commandes utiles
+## Generer des donnees et images de test
 
-- Generer uniquement le dataset:
-
+- Regenerer le dataset d'entrainement:
 ```bash
 python src/ml/generate_image_dataset.py
 ```
 
-- Lancer un test rapide:
-
+- Generer des images de test dans `images/`:
 ```bash
-python tests/test_quick.py
+python src/ml/generate_test_images.py
 ```
+Les images sont rangees par classe dans des sous-dossiers (`images/carre`, `images/cercle`, etc.).
 
-## 📊 Pipeline IA
+## Pipeline resumee
 
-1. Generation d'images synthetiques d'objets (cercle, rectangle, triangle, ellipse, pentagone, hexagone) avec OpenCV
-2. Extraction de features geometriques depuis les pixels:
-   - `w`, `h`
-   - `aspect_ratio`
-   - `circularity`
-   - `extent`, `solidity`
-   - `perimeter`, `area`
-3. Structuration dans `objects.csv` avec Pandas
-4. Entrainement d'un modele `scikit-learn` (pipeline `StandardScaler + KNeighborsClassifier`)
-5. Evaluation (accuracy, rapport de classification, matrice de confusion)
-6. Visualisation avec Matplotlib (`confusion_matrix.png`)
+1. Generation d'images synthetiques de formes avec OpenCV
+2. Extraction de descripteurs geometriques (`w`, `h`, ratio, circularite, aire, etc.)
+3. Entrainement d'un modele `StandardScaler + KNeighborsClassifier`
+4. Evaluation (accuracy, classification report, matrice de confusion)
+5. Prediction sur une image chargee par l'utilisateur
 
-## 🎓 Lien avec les objectifs pedagogiques
+## Documentation detaillee
 
-- **Algebre lineaire**: representation vectorielle des objets et distances dans l'espace des features
-- **Statistiques/probabilites**: separation train/test, normalisation, decision par voisinage (KNN)
-- **Data manipulation (NumPy/Pandas)**: nettoyage, structuration et analyse du dataset
-- **Reconnaissance d'objets**: identification automatique d'objets dans des images
-- **Python**: implementation complete de la chaine IA de bout en bout
+La documentation pedagogique complete est dans:
+- `docs/PROJECT_GUIDE.md`

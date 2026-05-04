@@ -25,15 +25,24 @@ def draw_random_circle(image_size: int):
 def draw_random_rectangle(image_size: int):
     image = _blank_image(image_size)
     if random.random() < 0.5:
-        w = random.randint(36, 60)
-        h = random.randint(14, 26)
+        w = random.randint(42, 62)
+        h = random.randint(14, 24)
     else:
-        w = random.randint(16, 28)
-        h = random.randint(34, 58)
+        w = random.randint(14, 24)
+        h = random.randint(42, 62)
     x = random.randint(4, image_size - w - 4)
     y = random.randint(4, image_size - h - 4)
     cv2.rectangle(image, (x, y), (x + w, y + h), 255, -1)
     return image, "Rectangle"
+
+
+def draw_random_square(image_size: int):
+    image = _blank_image(image_size)
+    side = random.randint(24, 44)
+    x = random.randint(6, image_size - side - 6)
+    y = random.randint(6, image_size - side - 6)
+    cv2.rectangle(image, (x, y), (x + side, y + side), 255, -1)
+    return image, "Carre"
 
 
 def draw_random_triangle(image_size: int):
@@ -50,8 +59,8 @@ def draw_random_triangle(image_size: int):
 
 def draw_random_ellipse(image_size: int):
     image = _blank_image(image_size)
-    center = (random.randint(26, image_size - 26), random.randint(26, image_size - 26))
-    axes = (random.randint(14, 28), random.randint(10, 22))
+    center = (random.randint(28, image_size - 28), random.randint(28, image_size - 28))
+    axes = (random.randint(18, 34), random.randint(10, 20))
     angle = random.randint(0, 180)
     cv2.ellipse(image, center, axes, angle, 0, 360, 255, -1)
     return image, "Ellipse"
@@ -69,9 +78,9 @@ def _regular_polygon_points(cx, cy, radius, sides, rotation_deg=0):
 
 def draw_random_pentagon(image_size: int):
     image = _blank_image(image_size)
-    r = random.randint(14, 26)
-    cx = random.randint(r + 6, image_size - r - 6)
-    cy = random.randint(r + 6, image_size - r - 6)
+    r = random.randint(16, 28)
+    cx = random.randint(r + 8, image_size - r - 8)
+    cy = random.randint(r + 8, image_size - r - 8)
     pts = _regular_polygon_points(cx, cy, r, 5, random.randint(0, 72))
     cv2.fillPoly(image, [pts], 255)
     return image, "Pentagone"
@@ -79,9 +88,9 @@ def draw_random_pentagon(image_size: int):
 
 def draw_random_hexagon(image_size: int):
     image = _blank_image(image_size)
-    r = random.randint(12, 20)
-    cx = random.randint(r + 6, image_size - r - 6)
-    cy = random.randint(r + 6, image_size - r - 6)
+    r = random.randint(15, 26)
+    cx = random.randint(r + 8, image_size - r - 8)
+    cy = random.randint(r + 8, image_size - r - 8)
     pts = _regular_polygon_points(cx, cy, r, 6, random.randint(0, 30))
     cv2.fillPoly(image, [pts], 255)
     return image, "Hexagone"
@@ -89,6 +98,7 @@ def draw_random_hexagon(image_size: int):
 
 DRAWERS = [
     draw_random_circle,
+    draw_random_square,
     draw_random_rectangle,
     draw_random_triangle,
     draw_random_ellipse,
@@ -105,7 +115,12 @@ FEATURE_COLUMNS = [
     "perimeter",
     "area",
     "vertices_fine",
+    "vertices_mid",
     "vertices_coarse",
+    "box_fill",
+    "circle_fill",
+    "area_ratio",
+    "eccentricity",
     "hu1",
     "hu2",
     "hu3",
@@ -118,8 +133,6 @@ def generate_image_dataset(samples_per_class: int = 300, image_size: int = 96):
     for drawer in DRAWERS:
         for _ in range(samples_per_class):
             image, label = drawer(image_size)
-            if random.random() < 0.5:
-                image = cv2.bitwise_not(image)
             features = extract_object_features(image)
             if features is None:
                 continue
@@ -128,6 +141,29 @@ def generate_image_dataset(samples_per_class: int = 300, image_size: int = 96):
             rows.append(row)
 
     return pd.DataFrame(rows)
+
+
+def generate_test_images(output_dir: str, per_class: int = 5, image_size: int = 256):
+    """Genere des images de test par classe dans des sous-dossiers."""
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Nettoie les anciennes images "a plat" pour garder une structure claire.
+    for entry in os.listdir(output_dir):
+        full_path = os.path.join(output_dir, entry)
+        if os.path.isfile(full_path) and entry.lower().endswith(".png"):
+            os.remove(full_path)
+
+    for drawer in DRAWERS:
+        _, class_label = drawer(image_size)
+        class_name = class_label.lower()
+        class_dir = os.path.join(output_dir, class_name)
+        os.makedirs(class_dir, exist_ok=True)
+        for idx in range(1, per_class + 1):
+            image, label = drawer(image_size)
+            file_name = f"{class_name}_{idx:02d}.png"
+            output_path = os.path.join(class_dir, file_name)
+            cv2.imwrite(output_path, image)
+            print(f"Image test creee: {output_path} ({label})")
 
 
 def save_dataset(df: pd.DataFrame, output_csv: str):

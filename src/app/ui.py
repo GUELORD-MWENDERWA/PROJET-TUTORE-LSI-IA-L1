@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from pipeline import build_preprocessed_mask, predict_single_image, train_pipeline
+from pipeline import predict_single_image_with_confidence, train_pipeline
 
 
 class ShapeRecognitionApp(QWidget):
@@ -57,13 +57,6 @@ class ShapeRecognitionApp(QWidget):
             "border: 2px dashed #38bdf8; background: #020617; color: #cbd5e1; border-radius: 12px;"
         )
         self.image_label.setMinimumSize(640, 480)
-        self.mask_label = QLabel("Masque binaire (debug)")
-        self.mask_label.setAlignment(Qt.AlignCenter)
-        self.mask_label.setStyleSheet(
-            "border: 2px dashed #f59e0b; background: #020617; color: #fde68a; border-radius: 12px;"
-        )
-        self.mask_label.setMinimumSize(640, 220)
-
         self.status_label = QLabel("Modele non entraine.")
         self.status_label.setStyleSheet("font-size: 14px; color: #93c5fd;")
 
@@ -78,18 +71,14 @@ class ShapeRecognitionApp(QWidget):
 
         predict_button = QPushButton("Predire la forme")
         predict_button.clicked.connect(self.predict_image)
-        preprocess_button = QPushButton("Pretraiter image")
-        preprocess_button.clicked.connect(self.preprocess_image)
 
         buttons = QHBoxLayout()
         buttons.addWidget(train_button)
         buttons.addWidget(open_button)
         buttons.addWidget(predict_button)
-        buttons.addWidget(preprocess_button)
 
         layout = QVBoxLayout()
         layout.addWidget(self.image_label, 1)
-        layout.addWidget(self.mask_label)
         layout.addLayout(buttons)
         layout.addWidget(self.status_label)
         layout.addWidget(self.prediction_label)
@@ -97,7 +86,7 @@ class ShapeRecognitionApp(QWidget):
 
     def train_model(self):
         try:
-            model_path, acc = train_pipeline(self.project_root, samples_per_class=300, image_size=96, k=5)
+            model_path, acc = train_pipeline(self.project_root, samples_per_class=500, image_size=128, k=8)
             self.model_path = model_path
             self.status_label.setText(f"Modele pret. Accuracy test: {acc:.3f}")
         except Exception as exc:
@@ -140,26 +129,7 @@ class ShapeRecognitionApp(QWidget):
             QMessageBox.information(self, "Image manquante", "Charge d'abord une image.")
             return
         try:
-            prediction = predict_single_image(self.model_path, self.current_image_path)
-            self.prediction_label.setText(f"Prediction: {prediction}")
+            prediction, confidence = predict_single_image_with_confidence(self.model_path, self.current_image_path)
+            self.prediction_label.setText(f"Prediction: {prediction} ({confidence * 100:.1f}%)")
         except Exception as exc:
             QMessageBox.critical(self, "Erreur prediction", str(exc))
-
-    def preprocess_image(self):
-        if not self.current_image_path:
-            QMessageBox.information(self, "Image manquante", "Charge d'abord une image.")
-            return
-        try:
-            mask = build_preprocessed_mask(self.current_image_path)
-            h, w = mask.shape
-            qimg = QImage(mask.data, w, h, w, QImage.Format_Grayscale8)
-            pixmap = QPixmap.fromImage(qimg).scaled(
-                self.mask_label.width(),
-                self.mask_label.height(),
-                Qt.KeepAspectRatio,
-                Qt.SmoothTransformation,
-            )
-            self.mask_label.setPixmap(pixmap)
-            self.status_label.setText("Masque binaire mis a jour.")
-        except Exception as exc:
-            QMessageBox.critical(self, "Erreur pretraitement", str(exc))
