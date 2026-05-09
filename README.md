@@ -1,52 +1,124 @@
-# Projet IA - Reconnaissance de formes
+# Projet IA L1 - Reconnaissance de formes géométriques
 
-Ce projet est conçu pour un débutant en programmation et en intelligence artificielle. Il montre comment créer des images simples, extraire des caractéristiques, entraîner un modèle et faire des prédictions.
+## Objectifs pédagogiques
 
-## Qu'est-ce que ce projet fait ?
+**BUT** : Maîtriser les bases de l'intelligence artificielle à travers l'étude des mathématiques décisionnelles, l'initiation à Python et l'entraînement de modèles de reconnaissance d'objets utilisant les frameworks NumPy/Pandas.
 
-Ce projet apprend à reconnaître des formes géométriques à partir d'une image. Les formes prises en charge sont :
+### Mission
 
-- `Carre`
-- `Rectangle`
-- `Cercle`
-- `Triangle`
-- `Ellipse`
-- `Pentagone`
-- `Hexagone`
+Comprendre la logique mathématique de l'IA et réaliser un premier projet d'identification visuelle automatisée, illustrant le passage de la donnée brute (images) à une décision algorithmique.
 
-## Pourquoi ce projet est utile pour un débutant
+### Compétences développées
 
-- Il utilise Python et des bibliothèques populaires comme NumPy, OpenCV, Matplotlib et Scikit-learn.
-- Il montre les étapes de base d'un projet de reconnaissance d'images.
-- Il contient des exercices pratiques pour apprendre pas à pas.
+- **Mathématiques décisionnelles** : Algèbre linéaire, statistiques et probabilités appliquées à la modélisation
+- **Manipulation de données** : Nettoyage, structuration et analyse de jeux de données avec NumPy/Pandas
+- **Reconnaissance d'objets** : Entraînement de modèles capables d'identifier des formes géométriques
+- **Programmation Python** : Maîtrise du langage pilier de l'IA
+
+## Description du projet
+
+Ce projet implémente un système de reconnaissance automatique de formes géométriques à partir d'images numériques. Les formes reconnues incluent :
+
+- Carré, Rectangle, Cercle, Triangle
+- Ellipse, Pentagone, Hexagone
+
+## Architecture technique
+
+### Pipeline de traitement
+
+1. **Acquisition de données** : Génération d'images synthétiques de formes géométriques
+2. **Extraction de caractéristiques** : Analyse morphologique et statistique des pixels
+3. **Entraînement du modèle** : Apprentissage supervisé avec algorithmes de classification
+4. **Évaluation et prédiction** : Validation des performances et classification de nouvelles images
+
+### Technologies utilisées
+
+- **NumPy** : Calculs matriciels et manipulation de tableaux multidimensionnels
+- **OpenCV** : Traitement d'images et extraction de caractéristiques visuelles
+- **Matplotlib** : Visualisation de données et résultats
+- **Scikit-learn** : Algorithmes d'apprentissage automatique
+- **Pandas** : Structures de données tabulaires (optionnel pour extension)
 
 ## Structure du projet
 
-- `src/` : code principal de l'application.
-- `src/ml/` : scripts de génération de données et de tests.
-- `docs/` : documentation pédagogique.
-- `images/` : exemples d'images générées.
-- `exercices_pratiques/` : dossiers des exercices 1 à 10.
-- `models/` : modèles entraînés.
+```
+projet_tutore/
+├── src/                    # Code principal de l'application
+│   ├── main.py            # Point d'entrée du programme
+│   ├── pipeline.py        # Pipeline de traitement d'images
+│   ├── app/ui.py          # Interface utilisateur
+│   ├── core/              # Noyau fonctionnel
+│   └── ml/                # Composants d'apprentissage automatique
+├── exercices_pratiques/   # Exercices pédagogiques 1-10
+├── images/                # Base de données d'images
+├── models/                # Modèles entraînés sauvegardés
+├── tests/                 # Tests unitaires et d'intégration
+└── docs/                  # Documentation technique
+```
 
-## Installation
+## Installation et configuration
 
-1. Créez et activez un environnement virtuel :
+### Environnement virtuel
 
 ```bash
 python -m venv env
+# Windows
 .\env\Scripts\activate
+# Linux/Mac
+source env/bin/activate
 ```
 
-2. Installez les dépendances :
+### Dépendances
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Exécution du projet principal
+## Utilisation
 
-- Pour lancer l'interface graphique :
+### Interface graphique principale
+
+```bash
+python src/main.py
+```
+
+### Génération de données d'entraînement
+
+```bash
+python src/ml/generate_image_dataset.py
+```
+
+### Tests du modèle
+
+```bash
+python src/ml/generate_test_images.py
+```
+
+## Exercices pratiques
+
+Les exercices 1 à 10 constituent une progression pédagogique couvrant :
+
+1. **Manipulation matricielle** : Représentation d'images avec NumPy
+2. **Traitement d'images** : Conversion, seuillage, détection de contours
+3. **Apprentissage automatique** : Préparation de données et entraînement de classifieurs
+4. **Évaluation** : Mesure des performances et validation croisée
+
+Chaque exercice inclut une implémentation complète avec documentation technique détaillée.
+
+## Évaluation et métriques
+
+Le système évalue les performances selon plusieurs critères :
+
+- **Précision globale** : Taux de classification correcte
+- **Matrice de confusion** : Analyse détaillée des erreurs
+- **Métriques par classe** : Performance spécifique à chaque forme géométrique
+
+## Perspectives d'extension
+
+- Intégration de réseaux de neurones convolutionnels (CNN)
+- Extension à la reconnaissance de formes complexes
+- Optimisation des performances computationnelles
+- Interface web pour déploiement applicatif
 
 ```bash
 python src/main.py

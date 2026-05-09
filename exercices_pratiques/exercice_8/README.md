@@ -1,50 +1,112 @@
-# Exercice 8 : Préparation de données pour l'apprentissage automatique
+# Exercice 8 : Structuration de données pour apprentissage supervisé
 
-## Objectif
+## Objectif pédagogique
 
-Comprendre la structuration des données pour l'entraînement de modèles de machine learning.
+Maîtriser la préparation et l'organisation de jeux de données pour l'apprentissage automatique supervisé, en appliquant les concepts d'espaces de caractéristiques et de codage des classes.
 
-## Concepts fondamentaux
+## Concepts mathématiques fondamentaux
 
-- **Jeu de données supervisé** : Ensemble de paires (caractéristiques, étiquette)
-- **Caractéristiques (features)** : Variables d'entrée décrivant les exemples
-- **Étiquettes (labels)** : Valeurs cibles à prédire
-- **Format matriciel** : Organisation des données en tableaux NumPy
+### Apprentissage supervisé
 
-## Description détaillée
+- **Espace d'entrée** : $\mathcal{X} \subseteq \mathbb{R}^d$ (espace des caractéristiques)
+- **Espace de sortie** : $\mathcal{Y} = \{0,1,\dots,k-1\}$ (classes pour classification)
+- **Jeu d'entraînement** : Ensemble $\{(x^{(i)}, y^{(i)})\}_{i=1}^N$ de $N$ exemples étiquetés
 
-Cet exercice illustre :
+### Représentation matricielle
 
-1. La création d'un jeu de données simple avec caractéristiques géométriques
-2. L'organisation des données en matrices X (caractéristiques) et y (étiquettes)
-3. La classification binaire (carré vs rectangle)
+- **Matrice des caractéristiques** : $X \in \mathbb{R}^{N \times d}$ avec $X_{ij} = j$-ème coordonnée de l'exemple $i$
+- **Vecteur des étiquettes** : $y \in \mathbb{R}^N$ avec $y_i \in \mathcal{Y}$
+- **Encodage one-hot** : Extension possible à $Y \in \{0,1\}^{N \times k}$ pour classification multi-classes
 
-## Code et explication
+## Description technique
+
+Cet exercice implémente la structuration complète d'un dataset supervisé :
+
+1. **Définition des caractéristiques** : Sélection de descripteurs géométriques pertinents
+2. **Codage des classes** : Attribution d'étiquettes numériques aux catégories
+3. **Organisation matricielle** : Format standard pour les bibliothèques d'IA
+
+## Implémentation et analyse
 
 ```python
 import numpy as np
 
-# Création du jeu de données
-# X : caractéristiques (largeur, hauteur)
-# y : étiquettes (0 = carré, 1 = rectangle)
+# Construction du jeu de données supervisé
+# Caractéristiques : dimensions géométriques (largeur, hauteur)
+# Classes : 0 = carré (largeur = hauteur), 1 = rectangle (largeur ≠ hauteur)
 
 X = np.array([
-    [10, 10],  # Carré
-    [20, 20],  # Carré
-    [15, 10],  # Rectangle
-    [25, 15],  # Rectangle
-    [12, 12],  # Carré
-    [18, 14]   # Rectangle
+    [10, 10],  # Exemple 1 : carré
+    [20, 20],  # Exemple 2 : carré
+    [15, 10],  # Exemple 3 : rectangle
+    [25, 15],  # Exemple 4 : rectangle
+    [12, 12],  # Exemple 5 : carré
+    [18, 14]   # Exemple 6 : rectangle
 ])
 
-y = np.array([0, 0, 1, 1, 0, 1])  # Étiquettes correspondantes
+# Vecteur des étiquettes : codage numérique des classes
+y = np.array([0, 0, 1, 1, 0, 1])
+
+print("Matrice des caracteristiques X:")
+print(X)
+print(f"\nDimensions de X: {X.shape}")
+print(f"\nVecteur des etiquettes y:")
+print(y)
+print(f"\nDimensions de y: {y.shape}")
+```
+
+## Analyse mathématique
+
+### Géométrie des données
+
+- **Dimensionnalité** : $d = 2$ (largeur, hauteur)
+- **Cardinalité** : $N = 6$ exemples d'entraînement
+- **Classes équilibrées** : 3 carrés, 3 rectangles
+
+### Propriétés statistiques
+
+- **Séparabilité linéaire** : Les classes sont séparables par la droite $largeur = hauteur$
+- **Variance intra-classe** : Variation des dimensions au sein de chaque classe
+- **Robustesse** : Résistance aux variations d'échelle
+
+### Représentation formelle
+
+$\mathcal{D} = \{(x^{(i)}, y^{(i)})\}_{i=1}^6$ où :
+
+- $x^{(i)} = (l_i, h_i) \in \mathbb{R}^2$
+- $y^{(i)} = \mathbb{I}_{l_i \neq h_i} \in \{0,1\}$
+
+## Applications en apprentissage automatique
+
+Cette structuration est la base de tous les algorithmes supervisés :
+
+- **Classification** : Prédiction de classes à partir de caractéristiques
+- **Régression** : Prédiction de valeurs continues
+- **Validation croisée** : Évaluation des performances sur données non vues
+- **Generalisation** : Capacité du modèle à traiter de nouveaux exemples
+
+## Exécution et validation
+
+```bash
+python solution.py
+```
+
+**Sortie attendue :**
+Affichage de la matrice X (6×2) et du vecteur y (6×1) avec leurs dimensions.
+
+## Concepts transversaux abordés
+
+- **Algèbre linéaire** : Manipulation de matrices et vecteurs
+- **Théorie des ensembles** : Définition d'espaces et de fonctions caractéristiques
+- **Statistiques** : Analyse descriptive des distributions de données
 
 print("Caracteristiques (X):")
 print(X)
 print("\nEtiquettes (y):")
 print(y)
 print(f"\nDimensions: X {X.shape}, y {y.shape}")
-```
+
+````
 
 ## Notions importantes
 
@@ -66,7 +128,7 @@ Cette structure est utilisée pour :
 
 ```bash
 python solution.py
-```
+````
 
 ## Résultat attendu
 
