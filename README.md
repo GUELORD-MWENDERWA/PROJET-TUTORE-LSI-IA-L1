@@ -171,7 +171,7 @@ Ces exercices vous aident à comprendre :
 - **Matplotlib** : outil pour afficher des images dans des notebooks ou des graphiques.
 - **Scikit-learn** : bibliothèque pour entraîner des modèles simples.
 
-## Conseils pour débutants
+## Conseils pour L1 Intelligence Artificiel
 
 - Commencez par lire `exercices_pratiques/exercice_1/README.md`.
 - Exécutez chaque script avec `python solution.py` dans le dossier de l'exercice.

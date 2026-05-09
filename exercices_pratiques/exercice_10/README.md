@@ -1,101 +1,45 @@
-# Exercice 10 : Extraction de caractéristiques et classification morphologique
+# Exercice 10 : Classification d'objets par analyse de pixels
 
-## Objectif pédagogique
+## Objectif
 
-Comprendre l'extraction de caractéristiques morphologiques et l'implémentation de règles de décision simples pour la classification d'objets dans les images binaires.
+Implémenter une classification simple basée sur l'analyse des caractéristiques d'image.
 
-## Concepts mathématiques fondamentaux
+## Concepts fondamentaux
 
-### Morphologie mathématique
+- **Caractéristiques d'image** : Propriétés extraites des pixels (somme, moyenne, etc.)
+- **Classification par seuillage** : Décision basée sur un critère numérique fixe
+- **Analyse morphologique** : Étude de la forme et de la structure des objets
 
-- **Image binaire** : $I: \mathbb{Z}^2 \rightarrow \{0,1\}$ où 1 représente l'objet, 0 le fond
-- **Caractéristiques morphologiques** : Propriétés géométriques extraites de l'objet
-- **Aire (surface)** : $A = \sum_{i,j} I_{ij}$ nombre total de pixels de l'objet
+## Description détaillée
 
-### Classification par seuil
+Cet exercice démontre :
 
-- **Fonction de décision** : $f(x) = \mathbb{I}_{x > \theta}$ où $\theta$ est le seuil
-- **Espace de décision** : Partition binaire de l'espace des caractéristiques
-- **Erreur de classification** : Probabilité de mauvaise décision
+1. La création d'une image binaire représentant une forme géométrique
+2. L'extraction d'une caractéristique simple (somme des pixels)
+3. La classification basée sur un seuil prédéfini
 
-## Description technique
-
-Cet exercice implémente une chaîne de traitement simplifiée :
-
-1. **Génération synthétique** : Création d'une forme géométrique binaire
-2. **Extraction de caractéristiques** : Calcul de descripteurs morphologiques
-3. **Classification automatique** : Application d'une règle de décision
-
-## Implémentation et analyse
+## Code et explication
 
 ```python
 import numpy as np
 
-# Génération d'une forme binaire : carré 3×3 centré dans matrice 5×5
-image_binaire = np.zeros((5, 5), dtype=np.uint8)
-image_binaire[1:4, 1:4] = 1  # Indices 1,2,3 pour chaque dimension
+# Création d'une image binaire représentant un carré
+image = np.zeros((5, 5), dtype=np.uint8)
+image[1:4, 1:4] = 1  # Carré 3x3 au centre
 
-# Extraction de la caractéristique morphologique : aire de l'objet
-aire_objet = np.sum(image_binaire)
+# Calcul de la caractéristique : nombre total de pixels blancs
+somme_pixels = np.sum(image)
 
-# Classification par seuil : distinction grand/petit objet
-seuil_morphologique = 8  # Seuil empirique pour la classification
-classification = aire_objet > seuil_morphologique
+# Classification basée sur un seuil
+seuil = 8  # Seuil pour considérer la forme comme "grande"
+est_grand_carre = somme_pixels > seuil
 
-print("Representation binaire de l'objet:")
-print(image_binaire)
-print(f"\nAire morphologique: {aire_objet} pixels")
-print(f"Seuil de decision: {seuil_morphologique}")
-print(f"Classification: {'Grand carre' if classification else 'Petit carre'}")
+print("Image binaire:")
+print(image)
+print(f"\nSomme des pixels: {somme_pixels}")
+print(f"Seuil: {seuil}")
+print(f"Classification: {'Grand carre' if est_grand_carre else 'Petit carre'}")
 ```
-
-## Analyse mathématique
-
-### Géométrie de la forme
-
-- **Matrice support** : $I \in \{0,1\}^{5 \times 5}$
-- **Objet discret** : Ensemble des pixels $(i,j)$ où $I_{ij} = 1$
-- **Aire calculée** : Cardinalité de l'ensemble objet = 9 pixels
-
-### Fonction caractéristique
-
-La classification repose sur la fonction indicatrice :
-$d(A) = \begin{cases} 1 & \text{si } A > 8 \\ 0 & \text{sinon} \end{cases}$
-
-Où $A$ représente l'aire morphologique de l'objet.
-
-### Propriétés de la décision
-
-- **Seuil adaptatif** : Peut être ajusté selon les besoins de l'application
-- **Robustesse** : Insensible aux translations de l'objet dans l'image
-- **Limites** : Ne capture que l'information de surface, pas la forme détaillée
-
-## Applications en vision par ordinateur
-
-Cette approche simplifiée est utilisée dans :
-
-- **Contrôle qualité industriel** : Vérification de dimensions d'objets
-- **Analyse de particules** : Comptage et classification en microscopie
-- **Préprocessing** : Filtrage d'objets selon leur taille
-- **Systèmes embarqués** : Classification rapide avec ressources limitées
-
-## Exécution et validation
-
-```bash
-python solution.py
-```
-
-**Résultat attendu :**
-Affichage de la matrice binaire, calcul de l'aire et classification résultante.
-
-## Concepts transversaux abordés
-
-- **Théorie des ensembles** : Caractérisation d'objets discrets
-- **Statistiques spatiales** : Analyse morphologique des formes
-- **Théorie de la décision** : Classification binaire par seuillage
-  print(f"Classification: {'Grand carre' if est_grand_carre else 'Petit carre'}")
-
-````
 
 ## Notions importantes
 
@@ -117,7 +61,7 @@ Cette approche simplifiée est utilisée pour :
 
 ```bash
 python solution.py
-````
+```
 
 ## Résultat attendu
 

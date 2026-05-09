@@ -1,104 +1,46 @@
-# Exercice 4 : Entrée/Sortie d'images et interface graphique OpenCV
+# Exercice 4 : Lecture et affichage d'une image avec OpenCV
 
-## Objectif pédagogique
+## Objectif
 
-Maîtriser les protocoles d'entrée/sortie d'images numériques et comprendre l'architecture d'affichage graphique dans le contexte de la vision par ordinateur appliquée.
+Maîtriser les opérations de base d'entrée/sortie d'images avec la bibliothèque OpenCV.
 
-## Concepts mathématiques et informatiques fondamentaux
+## Concepts fondamentaux
 
-### Représentation numérique des images
+- **OpenCV** : Bibliothèque spécialisée dans le traitement d'images et la vision par ordinateur
+- **Lecture d'image** : Chargement d'un fichier image en mémoire sous forme de tableau NumPy
+- **Affichage d'image** : Création de fenêtres graphiques pour visualiser les images
+- **Gestion d'événements** : Attente et traitement des interactions utilisateur
 
-- **Codage matriciel** : Image comme fonction discrète $I: \mathbb{Z}^2 \rightarrow \mathbb{R}^3$ (couleurs RGB)
-- **Formats de fichiers** : Encodage compressé (JPEG, PNG) vs représentation matricielle brute
-- **Espaces colorimétriques** : Conversion entre RGB, BGR, HSV selon les applications
+## Description détaillée
 
-### Architecture d'affichage
+Cet exercice couvre :
 
-- **Fenêtrage graphique** : Gestion des buffers d'affichage et des événements utilisateur
-- **Boucle d'événements** : Mécanisme de polling pour l'interaction homme-machine
-- **Gestion mémoire** : Allocation/désallocation des ressources graphiques
+1. Le chargement d'une image depuis le disque dur
+2. La vérification de la réussite du chargement
+3. L'affichage dans une fenêtre OpenCV
+4. La gestion de la fermeture de fenêtre
 
-## Description technique
-
-Cet exercice implémente le pipeline complet d'E/S visuelle :
-
-1. **Chargement de fichier** : Lecture et décodage d'un fichier image compressé
-2. **Validation des données** : Vérification de l'intégrité de la matrice chargée
-3. **Affichage graphique** : Rendu visuel avec interface utilisateur interactive
-4. **Gestion des ressources** : Libération propre de la mémoire graphique
-
-## Implémentation et architecture
+## Code et explication
 
 ```python
 import cv2
 
-# Spécification du chemin d'accès au fichier image
-chemin_image = '../../../images/carre/carre_01.png'
+# Chemin vers l'image (utilise une image existante du projet)
+image_path = '../../../images/carre/carre_01.png'
 
-# Opération d'E/S : chargement synchrone du fichier
-image = cv2.imread(chemin_image)
+# Chargement de l'image
+image = cv2.imread(image_path)
 
-# Validation de l'opération de chargement
+# Vérification du chargement
 if image is not None:
-    # Création d'une fenêtre d'affichage nommée
-    cv2.imshow('Visualisation OpenCV', image)
-
-    # Boucle d'attente d'événement : blocage jusqu'à interaction utilisateur
+    # Affichage dans une fenêtre
+    cv2.imshow('Image OpenCV', image)
+    # Attente d'une touche pour fermer
     cv2.waitKey(0)
-
-    # Libération des ressources graphiques
     cv2.destroyAllWindows()
 else:
-    print(f"Erreur E/S: Impossible de charger {chemin_image}")
+    print(f"Erreur: Impossible de charger l'image à partir de {image_path}")
 ```
-
-## Analyse technique
-
-### Gestion d'erreurs et robustesse
-
-- **Test de nullité** : Vérification de l'échec du chargement (fichier inexistant, corrompu)
-- **Messages diagnostiques** : Retour d'information pour débogage
-- **Graceful degradation** : Comportement contrôlé en cas d'erreur
-
-### Architecture événementielle
-
-- **Modèle synchrone** : Attente active d'un événement clavier
-- **Code de retour** : Valeur entière représentant la touche pressée
-- **Timeout configurable** : Possibilité d'attente limitée dans le temps
-
-### Optimisations mémoire
-
-- **Lazy loading** : Chargement à la demande uniquement
-- **Resource management** : Libération explicite des fenêtres graphiques
-- **Memory mapping** : Accès direct aux données sans copie intermédiaire
-
-## Applications en IA et vision par ordinateur
-
-Ces primitives d'E/S constituent la base de tout système de vision :
-
-- **Acquisition de données** : Interface avec capteurs et caméras
-- **Validation de datasets** : Vérification de l'intégrité des données d'entraînement
-- **Débogage visuel** : Inspection intermédiaire des résultats de traitement
-- **Interfaces homme-machine** : Intégration dans des applications interactives
-
-## Exécution et validation
-
-```bash
-python solution.py
-```
-
-**Comportement attendu :**
-Ouverture d'une fenêtre graphique affichant l'image carrée, fermeture sur pression d'une touche quelconque.
-
-## Concepts transversaux
-
-- **Programmation système** : Gestion des ressources et des E/S
-- **Interface homme-machine** : Conception d'interactions utilisateur
-- **Architecture logicielle** : Séparation des préoccupations (chargement/affichage)
-  else:
-  print(f"Erreur: Impossible de charger l'image à partir de {image_path}")
-
-````
 
 ## Notions importantes
 
@@ -119,7 +61,7 @@ Ces fonctions de base sont essentielles pour :
 
 ```bash
 python solution.py
-````
+```
 
 ## Résultat attendu
 
