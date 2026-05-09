@@ -1,35 +1,76 @@
-# Exercice 9 : Entraînement d'un classifieur simple K-NN
+# Exercice 9 : Entraînement d'un classifieur K-Nearest Neighbors
 
 ## Objectif
 
-Cet exercice montre comment entraîner un modèle K-Nearest Neighbors (K-NN) avec Scikit-learn.
+Implémenter et entraîner un modèle de classification par plus proches voisins.
 
-## Ce que fait ce script
+## Concepts fondamentaux
 
-- Il prépare un jeu de données de largeur/hauteur pour des objets.
-- Il sépare les données en ensembles d'entraînement et de test.
-- Il entraîne un classifieur K-NN.
-- Il effectue une prédiction sur une nouvelle forme.
+- **Apprentissage supervisé** : Algorithme qui apprend à partir d'exemples étiquetés
+- **K-Nearest Neighbors (K-NN)** : Classification basée sur la similarité avec les voisins
+- **Validation croisée** : Séparation entraînement/test pour évaluer les performances
+- **Distance euclidienne** : Mesure de similarité entre points dans l'espace des caractéristiques
 
-## Structure du code
+## Description détaillée
 
-- `create_dataset()` : crée les données et les labels.
-- `train_knn_classifier(X, y, n_neighbors=3)` : divise les données et entraîne le modèle.
-- `main()` : exécute l'entraînement et affiche la prédiction.
+Cet exercice couvre :
 
-## Comment exécuter
+1. La préparation d'un jeu de données géométriques
+2. La séparation en ensembles d'entraînement et de test
+3. L'entraînement d'un modèle K-NN
+4. La prédiction sur de nouvelles données
+
+## Code et explication
+
+```python
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+
+# Jeu de données : [largeur, hauteur] -> classe (0=carré, 1=rectangle)
+X = np.array([
+    [10, 10], [20, 20], [15, 10], [25, 15], [12, 12], [18, 14],
+    [8, 8], [22, 18], [14, 12], [16, 16], [9, 7], [21, 19]
+])
+y = np.array([0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1])
+
+# Séparation entraînement/test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Entraînement du modèle K-NN
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(X_train, y_train)
+
+# Prédiction sur une nouvelle forme
+nouvelle_forme = np.array([[6, 6]])
+prediction = knn.predict(nouvelle_forme)
+
+print(f"Prediction pour [6, 6]: {'Carre' if prediction[0] == 0 else 'Rectangle'}")
+print(f"Score sur l'ensemble de test: {knn.score(X_test, y_test):.2f}")
+```
+
+## Notions importantes
+
+- **Paramètre k** : Nombre de voisins considérés (ici k=3)
+- **Distance par défaut** : Euclidienne pour les caractéristiques numériques
+- **train_test_split** : Division aléatoire préservant la distribution des classes
+- **Score de précision** : Proportion de prédictions correctes
+
+## Applications pratiques
+
+K-NN est utilisé pour :
+
+- La classification d'images simples
+- Les systèmes de recommandation
+- La reconnaissance de formes géométriques
+- Les problèmes où la similarité locale est importante
+
+## Exécution
 
 ```bash
 python solution.py
 ```
 
-## Explication pour débutants
+## Résultat attendu
 
-- `train_test_split()` sépare les données pour tester si le modèle apprend bien.
-- `KNeighborsClassifier(n_neighbors=3)` classe un objet en regardant ses 3 voisins les plus proches.
-- `model.predict([[6, 6]])` donne la classe d'une nouvelle forme.
-
-## Remarques
-
-- `0` signifie "carré" et `1` signifie "rectangle".
-- Ce script montre le flux complet : données -> entraînement -> prédiction.
+Affiche la prédiction pour une nouvelle forme et le score de précision sur l'ensemble de test.

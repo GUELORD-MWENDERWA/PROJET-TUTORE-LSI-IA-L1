@@ -1,34 +1,68 @@
-# Exercice 10 : Simulation de reconnaissance d'objet très basique
+# Exercice 10 : Classification d'objets par analyse de pixels
 
 ## Objectif
 
-Cet exercice simule une reconnaissance d'objet simple en vérifiant si une forme contient suffisamment de pixels blancs.
+Implémenter une classification simple basée sur l'analyse des caractéristiques d'image.
 
-## Ce que fait ce script
+## Concepts fondamentaux
 
-- Il crée un tableau NumPy 5x5 représentant une forme simple.
-- Il calcule la somme de tous les pixels.
-- Il compare cette somme à un seuil pour décider si la forme est un "grand carré".
+- **Caractéristiques d'image** : Propriétés extraites des pixels (somme, moyenne, etc.)
+- **Classification par seuillage** : Décision basée sur un critère numérique fixe
+- **Analyse morphologique** : Étude de la forme et de la structure des objets
 
-## Structure du code
+## Description détaillée
 
-- `create_simple_shape()` : crée une image binaire avec un carré central.
-- `recognize_large_square(image, threshold_pixels)` : vérifie si la somme des pixels dépasse le seuil.
-- `main()` : affiche l'image et le résultat de la reconnaissance.
+Cet exercice démontre :
 
-## Comment exécuter
+1. La création d'une image binaire représentant une forme géométrique
+2. L'extraction d'une caractéristique simple (somme des pixels)
+3. La classification basée sur un seuil prédéfini
+
+## Code et explication
+
+```python
+import numpy as np
+
+# Création d'une image binaire représentant un carré
+image = np.zeros((5, 5), dtype=np.uint8)
+image[1:4, 1:4] = 1  # Carré 3x3 au centre
+
+# Calcul de la caractéristique : nombre total de pixels blancs
+somme_pixels = np.sum(image)
+
+# Classification basée sur un seuil
+seuil = 8  # Seuil pour considérer la forme comme "grande"
+est_grand_carre = somme_pixels > seuil
+
+print("Image binaire:")
+print(image)
+print(f"\nSomme des pixels: {somme_pixels}")
+print(f"Seuil: {seuil}")
+print(f"Classification: {'Grand carre' if est_grand_carre else 'Petit carre'}")
+```
+
+## Notions importantes
+
+- **Image binaire** : Chaque pixel vaut 0 (noir) ou 1 (blanc)
+- **np.sum()** : Addition de tous les éléments du tableau
+- **Classification par seuil** : Décision binaire basée sur une valeur limite
+- **Caractéristique simple** : La somme des pixels comme mesure de taille
+
+## Applications pratiques
+
+Cette approche simplifiée est utilisée pour :
+
+- Les systèmes de vision industrielle basiques
+- Le prétraitement avant des algorithmes plus complexes
+- La détection de formes simples
+- Les applications embarquées avec ressources limitées
+
+## Exécution
 
 ```bash
 python solution.py
 ```
 
-## Explication pour débutants
+## Résultat attendu
 
-- `np.sum(image)` additionne tous les pixels de l'image.
-- Dans une image binaire, plus il y a de `1`, plus la forme est grande.
-- Ce script ne fait pas de vraie reconnaissance intelligente : il utilise simplement une règle basée sur la taille.
-
-## Pourquoi c'est utile
-
-- C'est une première étape pour comprendre comment un algorithme peut prendre une décision.
-- Les vrais modèles de reconnaissance utilisent des règles plus complexes ou des réseaux de neurones.
+Affiche l'image binaire, la somme des pixels et la classification résultante.

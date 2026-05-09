@@ -1,33 +1,73 @@
-# Exercice 8 : Préparation de données pour un modèle simple
+# Exercice 8 : Préparation de données pour l'apprentissage automatique
 
 ## Objectif
 
-Cet exercice présente comment organiser des données pour un modèle de machine learning.
+Comprendre la structuration des données pour l'entraînement de modèles de machine learning.
 
-## Ce que fait ce script
+## Concepts fondamentaux
 
-- Il crée une liste de caractéristiques (`X`) contenant la largeur et la hauteur de formes.
-- Il crée une liste de labels (`y`) indiquant si l'objet est un carré (`0`) ou un rectangle (`1`).
-- Il affiche les deux listes.
+- **Jeu de données supervisé** : Ensemble de paires (caractéristiques, étiquette)
+- **Caractéristiques (features)** : Variables d'entrée décrivant les exemples
+- **Étiquettes (labels)** : Valeurs cibles à prédire
+- **Format matriciel** : Organisation des données en tableaux NumPy
 
-## Structure du code
+## Description détaillée
 
-- `create_feature_dataset()` : prépare les données de base.
-- `main()` : affiche les caractéristiques et les labels.
+Cet exercice illustre :
 
-## Comment exécuter
+1. La création d'un jeu de données simple avec caractéristiques géométriques
+2. L'organisation des données en matrices X (caractéristiques) et y (étiquettes)
+3. La classification binaire (carré vs rectangle)
+
+## Code et explication
+
+```python
+import numpy as np
+
+# Création du jeu de données
+# X : caractéristiques (largeur, hauteur)
+# y : étiquettes (0 = carré, 1 = rectangle)
+
+X = np.array([
+    [10, 10],  # Carré
+    [20, 20],  # Carré
+    [15, 10],  # Rectangle
+    [25, 15],  # Rectangle
+    [12, 12],  # Carré
+    [18, 14]   # Rectangle
+])
+
+y = np.array([0, 0, 1, 1, 0, 1])  # Étiquettes correspondantes
+
+print("Caracteristiques (X):")
+print(X)
+print("\nEtiquettes (y):")
+print(y)
+print(f"\nDimensions: X {X.shape}, y {y.shape}")
+```
+
+## Notions importantes
+
+- **Matrice X** : Chaque ligne représente un exemple, chaque colonne une caractéristique
+- **Vecteur y** : Une étiquette par exemple (même nombre de lignes que X)
+- **Classification binaire** : Étiquettes 0/1 pour deux classes
+- **Format NumPy** : Arrays multidimensionnels optimisés pour les calculs
+
+## Applications pratiques
+
+Cette structure est utilisée pour :
+
+- L'entraînement de tous les algorithmes supervisés
+- La validation croisée des modèles
+- L'évaluation des performances
+- Le prétraitement des données réelles
+
+## Exécution
 
 ```bash
 python solution.py
 ```
 
-## Explication pour débutants
+## Résultat attendu
 
-- `X` contient les exemples d'entrée : ici, chaque ligne est `[largeur, hauteur]`.
-- `y` contient la sortie attendue : la classe de chaque exemple.
-- Les modèles de machine learning apprennent à partir de ces données.
-
-## Pourquoi c'est utile
-
-- Avant d'entraîner un modèle, il faut toujours préparer les données sous forme de tableaux.
-- Cette structure `X` et `y` est la base de presque tous les modèles scikit-learn.
+Affiche les matrices X et y avec leurs dimensions, montrant la structure des données d'entraînement.

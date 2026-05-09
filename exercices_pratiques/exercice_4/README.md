@@ -2,32 +2,67 @@
 
 ## Objectif
 
-Cet exercice montre comment ouvrir une image existante et l'afficher dans une fenêtre grâce à OpenCV.
+Maîtriser les opérations de base d'entrée/sortie d'images avec la bibliothèque OpenCV.
 
-## Ce que fait ce script
+## Concepts fondamentaux
 
-- Il lit un fichier image (`.jpg`, `.png`, etc.).
-- Il vérifie que l'image a été chargée.
-- Il ouvre une fenêtre pour afficher l'image.
-- Il ferme la fenêtre après qu'une touche est pressée.
+- **OpenCV** : Bibliothèque spécialisée dans le traitement d'images et la vision par ordinateur
+- **Lecture d'image** : Chargement d'un fichier image en mémoire sous forme de tableau NumPy
+- **Affichage d'image** : Création de fenêtres graphiques pour visualiser les images
+- **Gestion d'événements** : Attente et traitement des interactions utilisateur
 
-## Structure du code
+## Description détaillée
 
-- `load_image(image_path)` : charge l'image depuis le chemin.
-- `display_image(window_name, image)` : affiche l'image et attend une touche.
-- `main()` : gère les arguments et exécute l'affichage.
+Cet exercice couvre :
 
-## Comment exécuter
+1. Le chargement d'une image depuis le disque dur
+2. La vérification de la réussite du chargement
+3. L'affichage dans une fenêtre OpenCV
+4. La gestion de la fermeture de fenêtre
 
-1. Placez une image dans ce dossier ou utilisez un chemin complet.
-2. Exécutez :
+## Code et explication
 
-```bash
-python solution.py --image mon_image.jpg
+```python
+import cv2
+
+# Chemin vers l'image (utilise une image existante du projet)
+image_path = '../../../images/carre/carre_01.png'
+
+# Chargement de l'image
+image = cv2.imread(image_path)
+
+# Vérification du chargement
+if image is not None:
+    # Affichage dans une fenêtre
+    cv2.imshow('Image OpenCV', image)
+    # Attente d'une touche pour fermer
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+else:
+    print(f"Erreur: Impossible de charger l'image à partir de {image_path}")
 ```
 
-## Notes pour débutants
+## Notions importantes
 
-- OpenCV utilise l'espace de couleurs BGR, pas RGB.
-- Si le script affiche une erreur, vérifiez que le nom du fichier est correct.
-- `cv2.waitKey(0)` signifie "attendre indéfiniment" jusqu'à ce qu'une touche soit pressée.
+- **cv2.imread()** : Retourne `None` si le fichier n'existe pas ou est corrompu
+- **cv2.imshow()** : Crée une fenêtre avec le titre spécifié
+- **cv2.waitKey(0)** : Attend indéfiniment une pression de touche
+- **cv2.destroyAllWindows()** : Ferme toutes les fenêtres OpenCV ouvertes
+
+## Applications pratiques
+
+Ces fonctions de base sont essentielles pour :
+
+- Le débogage de pipelines de traitement d'images
+- La visualisation intermédiaire des résultats
+- L'inspection manuelle des images chargées
+
+## Exécution
+
+```bash
+python solution.py
+```
+
+## Résultat attendu
+
+Ouvre une fenêtre affichant l'image carrée du projet. Appuyez sur une touche pour fermer.

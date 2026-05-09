@@ -2,28 +2,60 @@
 
 ## Objectif
 
-Cet exercice montre comment transformer une image en niveaux de gris en une image binaire qui sépare le "clair" du "sombre".
+Comprendre et implémenter le seuillage binaire pour la segmentation d'images.
 
-## Ce que fait ce script
+## Concepts fondamentaux
 
-- Il crée une image 5x5 avec des valeurs de pixels aléatoires entre 0 et 255.
-- Il compare chaque pixel à un seuil de 127.
-- Il génère une image binaire où les valeurs supérieures au seuil deviennent 1 et les autres deviennent 0.
+- **Seuillage (Thresholding)** : Technique de segmentation qui convertit une image en niveaux de gris en image binaire
+- **Image binaire** : Image ne contenant que deux valeurs (0 et 1, ou noir et blanc)
+- **Segmentation** : Processus de séparation d'une image en régions distinctes
 
-## Structure du code
+## Description détaillée
 
-- `create_random_image()` : crée un tableau NumPy 5x5.
-- `threshold_image(image, threshold=127)` : transforme l'image en noir/blanc.
-- `main()` : affiche l'image originale et l'image seuillée.
+Cet exercice illustre :
 
-## Comment exécuter
+1. La génération d'une matrice 5x5 avec des valeurs aléatoires (0-255)
+2. L'application d'un seuil fixe (127) pour binariser l'image
+3. La conversion des valeurs booléennes en entiers
+
+## Code et explication
+
+```python
+import numpy as np
+
+# Création d'une image 5x5 avec valeurs aléatoires
+image_couleur_simulee = np.random.randint(0, 256, size=(5, 5))
+
+# Seuillage : pixels > 127 deviennent 1, autres deviennent 0
+image_binaire = (image_couleur_simulee > 127).astype(np.uint8)
+
+print("Image simulée originale:")
+print(image_couleur_simulee)
+print("\nImage binaire (seuillage):")
+print(image_binaire)
+```
+
+## Notions importantes
+
+- **Comparaison vectorielle** : `image > seuil` retourne un tableau de booléens
+- **Conversion de type** : `.astype(np.uint8)` transforme True/False en 1/0
+- **Choix du seuil** : 127 est la moyenne entre 0 et 255, mais peut être ajusté selon les besoins
+
+## Applications pratiques
+
+Le seuillage est utilisé pour :
+
+- La détection de contours
+- La séparation avant/arrière-plan
+- La préparation d'images pour l'analyse morphologique
+- Les systèmes de vision industrielle
+
+## Exécution
 
 ```bash
 python solution.py
 ```
 
-## Explication pour débutants
+## Résultat attendu
 
-- La comparaison `image > threshold` crée un tableau de valeurs booléennes (`True` ou `False`).
-- `astype(np.uint8)` convertit ces valeurs en `0` et `1`.
-- L'image binaire est utile pour détecter des zones claires ou sombres.
+Affiche une matrice 5x5 aléatoire puis sa version binarisée avec le seuil 127.

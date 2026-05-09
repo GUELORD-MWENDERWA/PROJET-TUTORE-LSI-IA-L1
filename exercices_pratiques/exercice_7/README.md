@@ -1,35 +1,69 @@
-# Exercice 7 : Afficher des images avec Matplotlib
+# Exercice 7 : Affichage d'images avec Matplotlib
 
 ## Objectif
 
-Cet exercice explique pourquoi Matplotlib est souvent utilisé pour afficher des images dans les notebooks Python.
+Maîtriser l'affichage d'images dans des environnements graphiques interactifs avec Matplotlib.
 
-## Ce que fait ce script
+## Concepts fondamentaux
 
-- Il charge une image avec OpenCV.
-- Il convertit l'image du format BGR d'OpenCV vers le format RGB de Matplotlib.
-- Il affiche l'image dans une fenêtre Matplotlib.
+- **Matplotlib** : Bibliothèque de visualisation scientifique pour Python
+- **Conversion BGR vers RGB** : Correction de l'ordre des canaux de couleur
+- **Affichage interactif** : Visualisation dans des fenêtres avec contrôles
 
-## Structure du code
+## Description détaillée
 
-- `load_image(image_path)` : charge un fichier image.
-- `convert_bgr_to_rgb(image)` : change l'ordre des canaux de couleur.
-- `display_image_with_matplotlib(image)` : montre l'image avec Matplotlib.
-- `main()` : orchestre l'exécution.
+Cet exercice démontre :
 
-## Comment exécuter
+1. Le chargement d'une image avec OpenCV
+2. La conversion nécessaire entre formats de couleur
+3. L'affichage avec Matplotlib pour une visualisation améliorée
 
-```bash
-python solution.py --image mon_image.jpg
+## Code et explication
+
+```python
+import cv2
+import matplotlib.pyplot as plt
+
+# Chargement de l'image
+image_path = '../../../images/triangle/triangle_01.png'
+image_bgr = cv2.imread(image_path)
+
+if image_bgr is not None:
+    # Conversion BGR vers RGB pour Matplotlib
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+
+    # Affichage avec Matplotlib
+    plt.figure(figsize=(8, 6))
+    plt.imshow(image_rgb)
+    plt.title('Image affichee avec Matplotlib')
+    plt.axis('off')  # Masquer les axes
+    plt.show()
+else:
+    print(f"Erreur: Impossible de charger l'image à partir de {image_path}")
 ```
 
-## Pourquoi c'est important
+## Notions importantes
 
-- OpenCV lit les images en BGR.
-- Matplotlib attend des images en RGB.
-- Si vous ne convertissez pas, les couleurs seront inversées (bleu/rouge).
+- **Format BGR d'OpenCV** : Bleu-Vert-Rouge (convention historique)
+- **Format RGB standard** : Rouge-Vert-Bleu (convention Matplotlib)
+- **plt.axis('off')** : Supprime les graduations des axes pour un affichage propre
+- **plt.show()** : Affiche la figure dans une fenêtre interactive
 
-## Conseils pour débutants
+## Applications pratiques
 
-- `plt.axis('off')` enlève les axes, ce qui rend l'image plus propre.
-- Cette méthode est utile dans les notebooks Jupyter ou lorsque l'affichage OpenCV est instable.
+Matplotlib est préféré pour :
+
+- Les environnements de développement interactifs (Jupyter notebooks)
+- La visualisation scientifique avec annotations
+- L'intégration dans des rapports et publications
+- Le débogage avec des sous-graphiques multiples
+
+## Exécution
+
+```bash
+python solution.py
+```
+
+## Résultat attendu
+
+Ouvre une fenêtre Matplotlib affichant l'image avec les couleurs correctes et sans axes.
