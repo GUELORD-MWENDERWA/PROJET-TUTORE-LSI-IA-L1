@@ -1,187 +1,120 @@
-# Projet IA L1 - Reconnaissance de formes géométriques
+# Geometric Shape Recognition with Classical Computer Vision
 
-## Objectifs pédagogiques
+An end-to-end image classification project that recognizes seven geometric shapes from raw images. It covers the full machine learning workflow: synthetic data generation, image preprocessing, geometric feature engineering, supervised training, evaluation and inference through a desktop application.
 
-**BUT** : Maîtriser les bases de l'intelligence artificielle à travers l'étude des mathématiques décisionnelles, l'initiation à Python et l'entraînement de modèles de reconnaissance d'objets utilisant les frameworks NumPy/Pandas.
+Developed as the tutored project of the first year of the LSI-IA (Software Engineering and Artificial Intelligence) program at ISIG Goma. The goal is to understand the mathematics behind an AI decision by going from pixels to a prediction without relying on a black-box deep learning model.
 
-### Mission
+**Classes:** square, rectangle, circle, ellipse, triangle, pentagon, hexagon.
 
-Comprendre la logique mathématique de l'IA et réaliser un premier projet d'identification visuelle automatisée, illustrant le passage de la donnée brute (images) à une décision algorithmique.
-
-### Compétences développées
-
-- **Mathématiques décisionnelles** : Algèbre linéaire, statistiques et probabilités appliquées à la modélisation
-- **Manipulation de données** : Nettoyage, structuration et analyse de jeux de données avec NumPy/Pandas
-- **Reconnaissance d'objets** : Entraînement de modèles capables d'identifier des formes géométriques
-- **Programmation Python** : Maîtrise du langage pilier de l'IA
-
-## Description du projet
-
-Ce projet implémente un système de reconnaissance automatique de formes géométriques à partir d'images numériques. Les formes reconnues incluent :
-
-- Carré, Rectangle, Cercle, Triangle
-- Ellipse, Pentagone, Hexagone
-
-## Architecture technique
-
-### Pipeline de traitement
-
-1. **Acquisition de données** : Génération d'images synthétiques de formes géométriques
-2. **Extraction de caractéristiques** : Analyse morphologique et statistique des pixels
-3. **Entraînement du modèle** : Apprentissage supervisé avec algorithmes de classification
-4. **Évaluation et prédiction** : Validation des performances et classification de nouvelles images
-
-### Technologies utilisées
-
-- **NumPy** : Calculs matriciels et manipulation de tableaux multidimensionnels
-- **OpenCV** : Traitement d'images et extraction de caractéristiques visuelles
-- **Matplotlib** : Visualisation de données et résultats
-- **Scikit-learn** : Algorithmes d'apprentissage automatique
-- **Pandas** : Structures de données tabulaires (optionnel pour extension)
-
-## Structure du projet
+## Pipeline
 
 ```
-projet_tutore/
-├── src/                    # Code principal de l'application
-│   ├── main.py            # Point d'entrée du programme
-│   ├── pipeline.py        # Pipeline de traitement d'images
-│   ├── app/ui.py          # Interface utilisateur
-│   ├── core/              # Noyau fonctionnel
-│   └── ml/                # Composants d'apprentissage automatique
-├── exercices_pratiques/   # Exercices pédagogiques 1-10
-├── images/                # Base de données d'images
-├── models/                # Modèles entraînés sauvegardés
-├── tests/                 # Tests unitaires et d'intégration
-└── docs/                  # Documentation technique
+ Synthetic image      Preprocessing          Feature extraction        Classifier              Output
+ generation      ──>  grayscale, threshold,  ──>  19 geometric and  ──>  StandardScaler    ──>  label +
+ (OpenCV)             morphology, contour        Hu moment features      + Random Forest        confusion matrix
 ```
 
-## Installation et configuration
+### Features
 
-### Environnement virtuel
+Each image is reduced to a vector of shape descriptors computed from its main contour:
+
+| Group | Features |
+| --- | --- |
+| Size and proportions | width, height, aspect ratio, area, perimeter |
+| Shape regularity | circularity, extent, solidity, eccentricity, area ratio |
+| Polygon approximation | vertex count at fine, medium and coarse tolerance |
+| Fill ratios | bounding-box fill, enclosing-circle fill |
+| Invariant moments | first four Hu moments (log-scaled) |
+
+Preprocessing is robust to inverted images (light shape on dark background and the reverse), ignores contours touching the border, and recentres the object before measuring it.
+
+### Model
+
+A scikit-learn `Pipeline` combining `StandardScaler` and a `RandomForestClassifier` with balanced class weights. The dataset is split 75/25 with a fixed random seed. Evaluation reports overall accuracy, a per-class classification report and a confusion matrix saved to `data/processed/confusion_matrix.png`.
+
+## Getting started
+
+Requirements: Python 3.10 or later.
+
+```bash
+git clone https://github.com/GUELORD-MWENDERWA/PROJET-TUTORE-LSI-IA-L1.git
+cd PROJET-TUTORE-LSI-IA-L1
+./run.sh                 # Windows: run.bat
+```
+
+The script creates a virtual environment, installs the dependencies and launches the application. To run steps manually:
 
 ```bash
 python -m venv env
-# Windows
-.\env\Scripts\activate
-# Linux/Mac
 source env/bin/activate
-```
-
-### Dépendances
-
-```bash
 pip install -r requirements.txt
+
+python src/main.py                                  # desktop application (PyQt5)
+python src/main.py --cli --samples 350 --size 96    # train and evaluate from the terminal
+python src/main.py --image path/to/shape.png        # train, then classify one image
 ```
 
-## Utilisation
+| Option | Default | Description |
+| --- | --- | --- |
+| `--samples` | 350 | Synthetic images generated per class |
+| `--size` | 96 | Image size in pixels |
+| `--k` | 5 | Model size parameter (number of trees = max(200, 40 x k)) |
+| `--cli` | off | Run without the graphical interface |
 
-### Interface graphique principale
+The trained model is saved to `models/object_knn.joblib`.
+
+## Tests
 
 ```bash
-python src/main.py
+python tests/test_quick.py      # fast smoke test on a small dataset
+python tests/test_model.py      # model training and prediction
+python tests/test_complete.py   # full pipeline
 ```
 
-### Génération de données d'entraînement
+## Repository structure
 
-```bash
-python src/ml/generate_image_dataset.py
+```
+src/
+  main.py                   Entry point (GUI or CLI)
+  pipeline.py               Training and inference orchestration
+  app/ui.py                 PyQt5 desktop interface
+  core/image_feature_extractor.py
+  ml/generate_image_dataset.py
+  ml/generate_test_images.py
+  ml/object_classifier.py
+images/                     Reference images, one folder per class
+data/processed/             Generated dataset and evaluation outputs
+exercices_pratiques/        Ten guided exercises (see below)
+tests/                      Smoke, model and end-to-end tests
+docs/PROJECT_GUIDE.md       Detailed project guide
 ```
 
-### Tests du modèle
+## Guided exercises
 
-```bash
-python src/ml/generate_test_images.py
-```
+The `exercices_pratiques/` directory contains ten exercises that build up the skills used in the project. Each has a statement and a reference solution.
 
-## Exercices pratiques
+| # | Topic |
+| --- | --- |
+| 1 | Pixel manipulation with NumPy |
+| 2 | Simulated image resizing |
+| 3 | Simple colour detection by thresholding |
+| 4 | Reading and displaying images with OpenCV |
+| 5 | Colour to grayscale conversion |
+| 6 | Edge detection with Canny |
+| 7 | Displaying images with Matplotlib |
+| 8 | Preparing data for machine learning |
+| 9 | Training a k-nearest neighbours classifier |
+| 10 | Object classification from pixel analysis |
 
-Les exercices 1 à 10 constituent une progression pédagogique couvrant :
+## Tech stack
 
-1. **Manipulation matricielle** : Représentation d'images avec NumPy
-2. **Traitement d'images** : Conversion, seuillage, détection de contours
-3. **Apprentissage automatique** : Préparation de données et entraînement de classifieurs
-4. **Évaluation** : Mesure des performances et validation croisée
+Python, NumPy, pandas, OpenCV, scikit-learn, Matplotlib, joblib, PyQt5.
 
-Chaque exercice inclut une implémentation complète avec documentation technique détaillée.
+## Limitations and next steps
 
-## Évaluation et métriques
+- The model is trained mostly on synthetic images; accuracy on photographs with clutter, perspective or occlusion will be lower.
+- Next steps: augment the dataset with real photographs, compare with a small convolutional neural network, and add real-time recognition from a webcam.
 
-Le système évalue les performances selon plusieurs critères :
+## License
 
-- **Précision globale** : Taux de classification correcte
-- **Matrice de confusion** : Analyse détaillée des erreurs
-- **Métriques par classe** : Performance spécifique à chaque forme géométrique
-
-## Perspectives d'extension
-
-- Intégration de réseaux de neurones convolutionnels (CNN)
-- Extension à la reconnaissance de formes complexes
-- Optimisation des performances computationnelles
-- Interface web pour déploiement applicatif
-
-```bash
-python src/main.py
-```
-
-- Pour lancer en mode ligne de commande et prédire une image :
-
-```bash
-python src/main.py --cli --image "chemin/vers/image.png"
-```
-
-## Génération de données et d'images de test
-
-- Pour régénérer le dataset d'entraînement :
-
-```bash
-python src/ml/generate_image_dataset.py
-```
-
-- Pour générer des images de test :
-
-```bash
-python src/ml/generate_test_images.py
-```
-
-Les images générées sont rangées par classe dans des sous-dossiers comme `images/carre`, `images/cercle`, etc.
-
-## Exercices pratiques
-
-Chaque exercice se trouve dans `exercices_pratiques/exercice_X` et contient :
-
-- `solution.py` : le code Python qui résout l'exercice.
-- `README.md` : une explication détaillée étape par étape.
-
-Ces exercices vous aident à comprendre :
-
-- comment manipuler des images avec NumPy,
-- comment lire et afficher une image avec OpenCV,
-- comment convertir une image en niveaux de gris,
-- comment détecter des bords,
-- comment afficher une image avec Matplotlib,
-- comment préparer des données pour un modèle,
-- et comment entraîner un classifieur K-NN.
-
-## Concepts de base expliqués ici
-
-- **Python** : langage utilisé pour écrire les scripts.
-- **NumPy** : bibliothèque pour manipuler des tableaux et des images.
-- **OpenCV** : bibliothèque pour lire, afficher et transformer des images.
-- **Matplotlib** : outil pour afficher des images dans des notebooks ou des graphiques.
-- **Scikit-learn** : bibliothèque pour entraîner des modèles simples.
-
-## Conseils pour L1 Intelligence Artificiel
-
-- Commencez par lire `exercices_pratiques/exercice_1/README.md`.
-- Exécutez chaque script avec `python solution.py` dans le dossier de l'exercice.
-- Lisez le README de chaque exercice : il explique le rôle de chaque fonction.
-- Si vous ne comprenez pas un mot, cherchez-le : c'est normal pour un premier projet.
-
-## Documentation détaillée
-
-La documentation pédagogique complète se trouve dans :
-
-- `docs/PROJECT_GUIDE.md`
-
-> Si vous débutez, prenez le temps de lire chaque README d'exercice avant de lancer le script. Ils sont conçus pour expliquer chaque étape.
+No license has been specified yet. Contact the author before reusing this code.
